@@ -40,10 +40,10 @@ const gallery = [
   { img: gallery3, label: "Produtos Premium" },
 ];
 
-const testimonials = [
-  { name: "Mariana Silva", initial: "M", text: "O ambiente é incrivelmente relaxante e a Dra. Gisele é maravilhosa. Meu rosto nunca teve tanto viço. Um momento de puro autocuidado que recomendo de olhos fechados." },
-  { name: "Camila Costa", initial: "C", text: "Fiz o peeling químico e os resultados foram muito além das minhas expectativas. O atendimento é impecável, cheio de mimos e a atenção aos detalhes é fantástica." },
-  { name: "Juliana Mendes", initial: "J", text: "Mais do que um tratamento estético, é uma experiência de relaxamento profundo. As mãos da Dra. Gisele são mágicas e ela tem um conhecimento técnico impressionante." },
+const fallbackTestimonials = [
+  { id: "f1", name: "Mariana Silva", text: "O ambiente é incrivelmente relaxante e a Dra. Gisele é maravilhosa. Meu rosto nunca teve tanto viço. Um momento de puro autocuidado que recomendo de olhos fechados.", rating: 5 },
+  { id: "f2", name: "Camila Costa", text: "Fiz o peeling químico e os resultados foram muito além das minhas expectativas. O atendimento é impecável, cheio de mimos e a atenção aos detalhes é fantástica.", rating: 5 },
+  { id: "f3", name: "Juliana Mendes", text: "Mais do que um tratamento estético, é uma experiência de relaxamento profundo. As mãos da Dra. Gisele são mágicas e ela tem um conhecimento técnico impressionante.", rating: 5 },
 ];
 
 function Home() {
