@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight } from "lucide-react";
+import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 import aboutImg from "@/assets/about.png";
 import gallery1 from "@/assets/gallery1.png";
 import gallery2 from "@/assets/gallery2.png";
 import gallery3 from "@/assets/gallery3.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,10 +40,10 @@ const gallery = [
   { img: gallery3, label: "Produtos Premium" },
 ];
 
-const testimonials = [
-  { name: "Mariana Silva", initial: "M", text: "O ambiente é incrivelmente relaxante e a Dra. Gisele é maravilhosa. Meu rosto nunca teve tanto viço. Um momento de puro autocuidado que recomendo de olhos fechados." },
-  { name: "Camila Costa", initial: "C", text: "Fiz o peeling químico e os resultados foram muito além das minhas expectativas. O atendimento é impecável, cheio de mimos e a atenção aos detalhes é fantástica." },
-  { name: "Juliana Mendes", initial: "J", text: "Mais do que um tratamento estético, é uma experiência de relaxamento profundo. As mãos da Dra. Gisele são mágicas e ela tem um conhecimento técnico impressionante." },
+const fallbackTestimonials = [
+  { id: "f1", name: "Mariana Silva", text: "O ambiente é incrivelmente relaxante e a Dra. Gisele é maravilhosa. Meu rosto nunca teve tanto viço. Um momento de puro autocuidado que recomendo de olhos fechados.", rating: 5 },
+  { id: "f2", name: "Camila Costa", text: "Fiz o peeling químico e os resultados foram muito além das minhas expectativas. O atendimento é impecável, cheio de mimos e a atenção aos detalhes é fantástica.", rating: 5 },
+  { id: "f3", name: "Juliana Mendes", text: "Mais do que um tratamento estético, é uma experiência de relaxamento profundo. As mãos da Dra. Gisele são mágicas e ela tem um conhecimento técnico impressionante.", rating: 5 },
 ];
 
 function Home() {
@@ -242,27 +243,124 @@ function Gallery() {
 }
 
 function Testimonials() {
+  const [items, setItems] = useState(fallbackTestimonials);
+  const [loading, setLoading] = useState(true);
+
+  const loadTestimonials = async () => {
+    const { data } = await supabase
+      .from("testimonials")
+      .select("id, name, text, rating")
+      .order("created_at", { ascending: false })
+      .limit(12);
+    if (data && data.length > 0) {
+      setItems(data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadTestimonials();
+  }, []);
+
+  const initial = (name: string) => name.trim().charAt(0).toUpperCase() || "•";
+
   return (
-    <section className="py-28 px-6 lg:px-10">
+    <section id="depoimentos" className="py-28 px-6 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs uppercase tracking-[0.3em] text-primary">Avaliações</span>
           <h2 className="mt-5 font-display text-4xl sm:text-5xl">O que dizem nossas clientes</h2>
+          <p className="mt-5 text-muted-foreground text-lg">
+            Histórias reais de quem já passou pelo nosso ateliê.
+          </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((t) => (
-            <blockquote key={t.name} className="bg-card border border-border/50 rounded-2xl p-8 shadow-soft">
-              <div className="text-primary font-display text-5xl leading-none mb-3">“</div>
-              <p className="text-foreground/85 leading-relaxed italic">{t.text}</p>
-              <footer className="mt-7 flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-accent/40 text-primary flex items-center justify-center font-display text-lg">{t.initial}</div>
-                <cite className="not-italic font-medium">{t.name}</cite>
-              </footer>
-            </blockquote>
-          ))}
+        {loading ? (
+          <div className="text-center text-muted-foreground">Carregando...</div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-6">
+            {items.map((t) => (
+              <blockquote key={t.id} className="bg-card border border-border/50 rounded-2xl p-8 shadow-soft">
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: t.rating ?? 5 }).map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                  ))}
+                </div>
+                <p className="text-foreground/85 leading-relaxed italic">{t.text}</p>
+                <footer className="mt-7 flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-accent/40 text-primary flex items-center justify-center font-display text-lg">{initial(t.name)}</div>
+                  <cite className="not-italic font-medium">{t.name}</cite>
+                </footer>
+              </blockquote>
+            ))}
+          </div>
+        )}
+        <div className="mt-14 max-w-2xl mx-auto">
+          <TestimonialForm onSubmitted={loadTestimonials} />
         </div>
       </div>
     </section>
+  );
+}
+
+function TestimonialForm({ onSubmitted }: { onSubmitted: () => void }) {
+  const [name, setName] = useState("");
+  const [text, setText] = useState("");
+  const [rating, setRating] = useState(5);
+  const [hover, setHover] = useState(0);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [error, setError] = useState("");
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedName = name.trim();
+    const trimmedText = text.trim();
+    if (trimmedName.length < 1 || trimmedName.length > 80) {
+      setError("O nome deve ter entre 1 e 80 caracteres."); setStatus("error"); return;
+    }
+    if (trimmedText.length < 10 || trimmedText.length > 1000) {
+      setError("O depoimento deve ter entre 10 e 1000 caracteres."); setStatus("error"); return;
+    }
+    setStatus("loading"); setError("");
+    const { error: insertError } = await supabase
+      .from("testimonials")
+      .insert({ name: trimmedName, text: trimmedText, rating });
+    if (insertError) {
+      setError("Não foi possível enviar agora. Tente novamente."); setStatus("error"); return;
+    }
+    setName(""); setText(""); setRating(5);
+    setStatus("success");
+    onSubmitted();
+    setTimeout(() => setStatus("idle"), 4000);
+  };
+
+  return (
+    <form onSubmit={submit} className="bg-card rounded-2xl p-8 border border-border/60 shadow-soft space-y-5">
+      <div className="text-center">
+        <h3 className="font-display text-2xl">Deixe seu depoimento</h3>
+        <p className="text-sm text-muted-foreground mt-2">Compartilhe sua experiência com a Dra. Gisele.</p>
+      </div>
+      <Field label="Seu nome">
+        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} required className="input" placeholder="Como podemos te chamar" />
+      </Field>
+      <Field label="Sua avaliação">
+        <div className="flex gap-1.5">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button key={n} type="button" onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)} onClick={() => setRating(n)} className="p-1" aria-label={`${n} estrelas`}>
+              <Star className={`w-7 h-7 transition ${(hover || rating) >= n ? "fill-primary text-primary" : "text-muted-foreground/40"}`} />
+            </button>
+          ))}
+        </div>
+      </Field>
+      <Field label="Seu depoimento">
+        <textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={1000} rows={4} required className="input resize-none" placeholder="Conte como foi sua experiência" />
+        <span className="text-xs text-muted-foreground mt-1 block">{text.length}/1000</span>
+      </Field>
+      {status === "error" && <p className="text-sm text-destructive">{error}</p>}
+      {status === "success" && <p className="text-sm text-primary">Obrigada! Seu depoimento foi publicado. ✨</p>}
+      <button type="submit" disabled={status === "loading"} className="w-full rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition disabled:opacity-60">
+        {status === "loading" ? "Enviando..." : "Publicar depoimento"}
+      </button>
+    </form>
   );
 }
 
