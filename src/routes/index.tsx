@@ -135,7 +135,7 @@ function Philosophy() {
       <div className="mx-auto max-w-4xl text-center">
         <span className="text-xs uppercase tracking-[0.3em] text-primary">Filosofia</span>
         <h2 className="mt-5 font-display text-4xl sm:text-5xl text-balance leading-[1.1]">
-          Elevando a autoestima através da <em className="font-light">ciência e do toque</em>.
+          Elevando a autoestima através da <span className="text-primary">ciência e do toque</span>.
         </h2>
         <p className="mt-8 text-muted-foreground text-lg leading-relaxed">
           Acreditamos que a estética vai muito além da aparência. É sobre como você se sente na sua própria pele.
