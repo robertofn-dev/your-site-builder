@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight } from "lucide-react";
+import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 import aboutImg from "@/assets/about.png";
 import gallery1 from "@/assets/gallery1.png";
 import gallery2 from "@/assets/gallery2.png";
 import gallery3 from "@/assets/gallery3.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
