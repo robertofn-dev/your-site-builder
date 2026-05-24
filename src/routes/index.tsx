@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dra. Gisele Nascimento — Clínica de Beleza & Estética Avançada" },
+      { title: "Clinica GN" },
       { name: "description", content: "Tratamentos estéticos personalizados no Tatuapé, São Paulo. Harmonização facial, botox, preenchimento e peeling com a Dra. Gisele Nascimento." },
       { property: "og:title", content: "Dra. Gisele Nascimento — Clínica de Beleza" },
       { property: "og:description", content: "Sua beleza, cuidada com maestria. Estética avançada em São Paulo." },
