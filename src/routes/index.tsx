@@ -463,6 +463,120 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+function Scheduling() {
+  const today = new Date();
+  const minDate = today.toISOString().split("T")[0];
+  const maxDateObj = new Date();
+  maxDateObj.setMonth(maxDateObj.getMonth() + 2);
+  const maxDate = maxDateObj.toISOString().split("T")[0];
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [treatment, setTreatment] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [error, setError] = useState("");
+
+  const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+
+  const formatDate = (iso: string) => {
+    const [y, m, d] = iso.split("-");
+    return `${d}/${m}/${y}`;
+  };
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    const selected = new Date(date + "T00:00:00");
+    if (selected.getDay() === 0) {
+      setError("Não atendemos aos domingos. Por favor, escolha de segunda a sábado.");
+      return;
+    }
+    const text =
+      `Olá, Dra. Gisele! Gostaria de agendar uma consulta.%0A%0A` +
+      `*Nome:* ${name}%0A` +
+      `*WhatsApp:* ${phone}%0A` +
+      `*Procedimento:* ${treatment}%0A` +
+      `*Data:* ${formatDate(date)}%0A` +
+      `*Horário:* ${time}%0A%0A` +
+      `Aguardo a confirmação. Obrigada!`;
+    window.open(`https://wa.me/551123826915?text=${text}`, "_blank");
+  };
+
+  return (
+    <section id="agendamento" className="py-28 px-6 lg:px-10">
+      <div className="mx-auto max-w-4xl">
+        <div className="text-center mb-14">
+          <span className="text-xs uppercase tracking-[0.3em] text-primary">Agendamento Online</span>
+          <h2 className="mt-5 font-display text-4xl sm:text-5xl">Escolha seu melhor dia e horário.</h2>
+          <p className="mt-5 text-muted-foreground text-lg">
+            Selecione uma data e horário disponíveis. Sua solicitação será enviada diretamente para o WhatsApp da Dra. Gisele para confirmação.
+          </p>
+        </div>
+
+        <form onSubmit={submit} className="bg-card rounded-3xl p-8 sm:p-10 border border-border/60 shadow-soft space-y-6">
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Field label="Nome completo">
+              <input value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} className="input" placeholder="Seu nome" />
+            </Field>
+            <Field label="WhatsApp">
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} required maxLength={20} className="input" placeholder="(11) 99999-9999" />
+            </Field>
+          </div>
+
+          <Field label="Procedimento desejado">
+            <select value={treatment} onChange={(e) => setTreatment(e.target.value)} required className="input">
+              <option value="">Selecione</option>
+              <option>Avaliação / Consulta</option>
+              <option>Harmonização Facial</option>
+              <option>Botox</option>
+              <option>Preenchimento Labial</option>
+              <option>Peeling Químico</option>
+              <option>Outro</option>
+            </select>
+          </Field>
+
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Field label="Data">
+              <input
+                type="date"
+                value={date}
+                min={minDate}
+                max={maxDate}
+                onChange={(e) => setDate(e.target.value)}
+                required
+                className="input"
+              />
+            </Field>
+            <Field label="Horário">
+              <select value={time} onChange={(e) => setTime(e.target.value)} required className="input">
+                <option value="">Selecione um horário</option>
+                {times.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <p className="text-xs text-muted-foreground flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-primary" />
+            Atendimento de segunda a sábado, das 09h às 17h.
+          </p>
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <button type="submit" className="w-full rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground hover:opacity-90 transition inline-flex items-center justify-center gap-2">
+            Enviar agendamento pelo WhatsApp <ArrowRight className="w-4 h-4" />
+          </button>
+          <p className="text-xs text-muted-foreground text-center">
+            Após enviar, a Dra. Gisele entrará em contato para confirmar a disponibilidade do horário.
+          </p>
+        </form>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="bg-foreground text-background py-12 px-6 lg:px-10">
