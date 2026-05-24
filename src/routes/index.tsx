@@ -76,7 +76,7 @@ function Header() {
           <a href="#tratamentos" className="hover:text-primary transition-colors">Tratamentos</a>
           <a href="#sobre" className="hover:text-primary transition-colors">Sobre</a>
           <a href="#galeria" className="hover:text-primary transition-colors">Galeria</a>
-          <a href="#agendamento" className="hover:text-primary transition-colors">Agendar</a>
+          
           <a href="#contato" className="hover:text-primary transition-colors">Contato</a>
         </nav>
         <a href="#agendamento" className="hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition shadow-soft">
@@ -95,7 +95,7 @@ function Header() {
           <a href="#tratamentos" onClick={() => setOpen(false)}>Tratamentos</a>
           <a href="#sobre" onClick={() => setOpen(false)}>Sobre</a>
           <a href="#galeria" onClick={() => setOpen(false)}>Galeria</a>
-          <a href="#agendamento" onClick={() => setOpen(false)}>Agendar</a>
+          
           <a href="#contato" onClick={() => setOpen(false)}>Contato</a>
           <a href="#agendamento" onClick={() => setOpen(false)} className="rounded-full bg-primary px-5 py-2.5 text-center text-primary-foreground">Agendar Online</a>
         </div>
