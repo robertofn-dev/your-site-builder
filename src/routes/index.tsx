@@ -613,6 +613,13 @@ function Scheduling() {
             </Field>
           </div>
 
+          <div className="rounded-2xl bg-primary/5 border border-primary/20 p-4 text-sm">
+            <p className="font-medium text-foreground">Taxa de reserva: R$ 100,00</p>
+            <p className="text-muted-foreground text-xs mt-1">
+              Garanta seu horário pagando uma taxa de R$ 100. O valor restante do tratamento é pago na clínica.
+            </p>
+          </div>
+
           <p className="text-xs text-muted-foreground flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
             Atendimento de segunda a sábado, das 09h às 17h. Horários já reservados aparecem como ocupados.
@@ -621,12 +628,31 @@ function Scheduling() {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <button type="submit" disabled={submitting} className="w-full rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60">
-            {submitting ? "Enviando..." : <>Enviar agendamento pelo WhatsApp <ArrowRight className="w-4 h-4" /></>}
+            {submitting ? "Preparando pagamento..." : <>Pagar R$ 100 e reservar horário <ArrowRight className="w-4 h-4" /></>}
           </button>
           <p className="text-xs text-muted-foreground text-center">
-            Após enviar, a Dra. Gisele entrará em contato para confirmar a disponibilidade do horário.
+            Pagamento seguro processado pelo Stripe. Em caso de cancelamento, entre em contato pelo WhatsApp.
           </p>
         </form>
+
+        {clientSecret && (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto p-4">
+            <div className="relative w-full max-w-xl my-8 bg-card rounded-2xl shadow-elegant">
+              <button
+                onClick={closeCheckout}
+                aria-label="Fechar"
+                className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center hover:bg-muted z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="p-2 sm:p-4">
+                <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
