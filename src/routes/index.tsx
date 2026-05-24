@@ -478,15 +478,31 @@ function Scheduling() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [taken, setTaken] = useState<string[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+  const allTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
   const formatDate = (iso: string) => {
     const [y, m, d] = iso.split("-");
     return `${d}/${m}/${y}`;
   };
 
-  const submit = (e: React.FormEvent) => {
+  // Carrega horários ocupados quando a data muda
+  useEffect(() => {
+    if (!date) { setTaken([]); return; }
+    setLoadingSlots(true);
+    setTime("");
+    supabase.rpc("get_taken_slots", { p_date: date }).then(({ data, error }) => {
+      if (!error && data) {
+        setTaken((data as Array<{ appointment_time: string }>).map((r) => r.appointment_time.slice(0, 5)));
+      }
+      setLoadingSlots(false);
+    });
+  }, [date]);
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     const selected = new Date(date + "T00:00:00");
@@ -494,8 +510,28 @@ function Scheduling() {
       setError("Não atendemos aos domingos. Por favor, escolha de segunda a sábado.");
       return;
     }
+    setSubmitting(true);
+    const { error: insertError } = await supabase.from("appointments").insert({
+      name, phone, treatment,
+      appointment_date: date,
+      appointment_time: `${time}:00`,
+      status: "pending",
+    });
+    setSubmitting(false);
+    if (insertError) {
+      if (insertError.code === "23505") {
+        setError("Esse horário acabou de ser reservado. Por favor, escolha outro.");
+        // recarrega slots
+        supabase.rpc("get_taken_slots", { p_date: date }).then(({ data }) => {
+          if (data) setTaken((data as any[]).map((r) => r.appointment_time.slice(0, 5)));
+        });
+      } else {
+        setError("Não foi possível salvar. Tente novamente.");
+      }
+      return;
+    }
     const text =
-      `Olá, Dra. Gisele! Gostaria de agendar uma consulta.%0A%0A` +
+      `Olá, Dra. Gisele! Acabei de fazer um agendamento pelo site.%0A%0A` +
       `*Nome:* ${name}%0A` +
       `*WhatsApp:* ${phone}%0A` +
       `*Procedimento:* ${treatment}%0A` +
@@ -503,6 +539,10 @@ function Scheduling() {
       `*Horário:* ${time}%0A%0A` +
       `Aguardo a confirmação. Obrigada!`;
     window.open(`https://wa.me/551123826915?text=${text}`, "_blank");
+    // limpa
+    setName(""); setPhone(""); setTreatment(""); setDate(""); setTime("");
+    setTaken([]);
+    alert("Agendamento enviado! A Dra. Gisele entrará em contato para confirmar.");
   };
 
   return (
@@ -551,24 +591,31 @@ function Scheduling() {
               />
             </Field>
             <Field label="Horário">
-              <select value={time} onChange={(e) => setTime(e.target.value)} required className="input">
-                <option value="">Selecione um horário</option>
-                {times.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
+              <select value={time} onChange={(e) => setTime(e.target.value)} required disabled={!date || loadingSlots} className="input">
+                <option value="">
+                  {!date ? "Escolha a data primeiro" : loadingSlots ? "Carregando..." : "Selecione um horário"}
+                </option>
+                {allTimes.map((t) => {
+                  const isTaken = taken.includes(t);
+                  return (
+                    <option key={t} value={t} disabled={isTaken}>
+                      {t} {isTaken ? "— ocupado" : ""}
+                    </option>
+                  );
+                })}
               </select>
             </Field>
           </div>
 
           <p className="text-xs text-muted-foreground flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
-            Atendimento de segunda a sábado, das 09h às 17h.
+            Atendimento de segunda a sábado, das 09h às 17h. Horários já reservados aparecem como ocupados.
           </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <button type="submit" className="w-full rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground hover:opacity-90 transition inline-flex items-center justify-center gap-2">
-            Enviar agendamento pelo WhatsApp <ArrowRight className="w-4 h-4" />
+          <button type="submit" disabled={submitting} className="w-full rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60">
+            {submitting ? "Enviando..." : <>Enviar agendamento pelo WhatsApp <ArrowRight className="w-4 h-4" /></>}
           </button>
           <p className="text-xs text-muted-foreground text-center">
             Após enviar, a Dra. Gisele entrará em contato para confirmar a disponibilidade do horário.
