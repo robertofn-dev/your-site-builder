@@ -491,6 +491,9 @@ function Scheduling() {
   const [submitting, setSubmitting] = useState(false);
   const [taken, setTaken] = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  const startCheckout = useServerFn(createAppointmentCheckout);
 
   const allTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
@@ -499,7 +502,6 @@ function Scheduling() {
     return `${d}/${m}/${y}`;
   };
 
-  // Carrega horários ocupados quando a data muda
   useEffect(() => {
     if (!date) { setTaken([]); return; }
     setLoadingSlots(true);
@@ -521,38 +523,32 @@ function Scheduling() {
       return;
     }
     setSubmitting(true);
-    const { error: insertError } = await supabase.from("appointments").insert({
-      name, phone, treatment,
-      appointment_date: date,
-      appointment_time: `${time}:00`,
-      status: "pending",
-    });
-    setSubmitting(false);
-    if (insertError) {
-      if (insertError.code === "23505") {
-        setError("Esse horário acabou de ser reservado. Por favor, escolha outro.");
-        // recarrega slots
-        supabase.rpc("get_taken_slots", { p_date: date }).then(({ data }) => {
-          if (data) setTaken((data as any[]).map((r) => r.appointment_time.slice(0, 5)));
-        });
-      } else {
-        setError("Não foi possível salvar. Tente novamente.");
-      }
-      return;
+    try {
+      const result = await startCheckout({
+        data: {
+          name, phone, treatment,
+          appointment_date: date,
+          appointment_time: time,
+          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+          environment: getStripeEnvironment(),
+        },
+      });
+      setClientSecret(result.clientSecret);
+    } catch (err: any) {
+      setError(err?.message || "Não foi possível iniciar o pagamento. Tente novamente.");
+    } finally {
+      setSubmitting(false);
     }
-    const text =
-      `Olá, Dra. Gisele! Acabei de fazer um agendamento pelo site.%0A%0A` +
-      `*Nome:* ${name}%0A` +
-      `*WhatsApp:* ${phone}%0A` +
-      `*Procedimento:* ${treatment}%0A` +
-      `*Data:* ${formatDate(date)}%0A` +
-      `*Horário:* ${time}%0A%0A` +
-      `Aguardo a confirmação. Obrigada!`;
-    window.open(`https://wa.me/551123826915?text=${text}`, "_blank");
-    // limpa
-    setName(""); setPhone(""); setTreatment(""); setDate(""); setTime("");
-    setTaken([]);
-    alert("Agendamento enviado! A Dra. Gisele entrará em contato para confirmar.");
+  };
+
+  const closeCheckout = () => {
+    setClientSecret(null);
+    // refresh taken slots
+    if (date) {
+      supabase.rpc("get_taken_slots", { p_date: date }).then(({ data }) => {
+        if (data) setTaken((data as any[]).map((r) => r.appointment_time.slice(0, 5)));
+      });
+    }
   };
 
   return (
