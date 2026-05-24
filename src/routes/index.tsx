@@ -3,7 +3,7 @@ import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDa
 import heroImg from "@/assets/hero.png";
 import aboutImg from "@/assets/about.jpg";
 import gallery1 from "@/assets/lips.jpg";
-import gallery2 from "@/assets/gallery2.png";
+import gallery2 from "@/assets/care.jpg";
 import gallery3 from "@/assets/gallery3.png";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
