@@ -172,7 +172,7 @@ function Treatments() {
               <p className="text-sm text-muted-foreground leading-relaxed flex-1">{t.desc}</p>
               <div className="mt-6 pt-5 border-t border-border/60 flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">{t.duration}</span>
-                <a href={WHATSAPP} target="_blank" rel="noreferrer" className="text-primary font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                <a href="#agendamento" className="text-primary font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                   Agendar <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>
