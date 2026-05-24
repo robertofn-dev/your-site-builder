@@ -585,7 +585,7 @@ function Scheduling() {
 
           <p className="text-xs text-muted-foreground flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
-            Atendimento de segunda a sábado, das 09h às 17h. Horários já reservados aparecem como ocupados.
+            Atendimento de segunda a sábado, das 09h às 17h. Se o horário já estiver reservado, avisaremos na hora.
           </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
