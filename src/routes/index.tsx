@@ -274,7 +274,7 @@ function Testimonials() {
           <span className="text-xs uppercase tracking-[0.3em] text-primary">Avaliações</span>
           <h2 className="mt-5 font-display text-4xl sm:text-5xl">O que dizem nossas clientes</h2>
           <p className="mt-5 text-muted-foreground text-lg">
-            Histórias reais de quem já passou pelo nosso clínica.
+            Histórias reais de quem já passou pela nossa clínica.
           </p>
         </div>
         {loading ? (
