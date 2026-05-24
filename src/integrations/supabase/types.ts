@@ -88,6 +88,17 @@ export type Database = {
           appointment_time: string
         }[]
       }
+      submit_appointment: {
+        Args: {
+          p_appointment_date: string
+          p_appointment_time: string
+          p_name: string
+          p_notes?: string
+          p_phone: string
+          p_treatment: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
