@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDays } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 import aboutImg from "@/assets/about.jpg";
-import gallery1 from "@/assets/gallery1.png";
+import gallery1 from "@/assets/lips.jpg";
 import gallery2 from "@/assets/gallery2.png";
 import gallery3 from "@/assets/gallery3.png";
 import { useState, useEffect } from "react";
@@ -35,7 +35,7 @@ const treatments = [
 ];
 
 const gallery = [
-  { img: gallery1, label: "Pele Radiante" },
+  { img: gallery1, label: "Lábios Radiantes" },
   { img: gallery2, label: "Cuidado Especializado" },
   { img: gallery3, label: "Produtos Premium" },
 ];
