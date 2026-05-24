@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDays, X } from "lucide-react";
+import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDays } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 import clinicInterior from "@/assets/clinic-interior.jpg";
 import aboutImg from "@/assets/about.jpg";
@@ -9,10 +9,7 @@ import gallery3 from "@/assets/gallery3.png";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { getStripe, getStripeEnvironment } from "@/lib/stripe";
-import { createAppointmentCheckout } from "@/lib/payments.functions";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { createAppointment } from "@/lib/appointments.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
