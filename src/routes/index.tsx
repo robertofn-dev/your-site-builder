@@ -106,9 +106,9 @@ function Header() {
 
 function Hero() {
   return (
-    <section id="top" className="relative h-[88vh] min-h-[620px] w-full overflow-hidden">
-      <img src={heroImg} alt="Clínica de beleza Dra. Gisele Nascimento" className="absolute inset-0 w-full h-full object-cover object-top" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/55" />
+    <section id="top" className="relative h-[88vh] min-h-[620px] w-full overflow-hidden bg-secondary">
+      <img src={heroImg} alt="Clínica de beleza Dra. Gisele Nascimento" className="absolute inset-y-0 right-0 h-full w-auto max-w-[55%] object-contain object-right-bottom" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10 h-full flex flex-col justify-center">
         <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/85 mb-6">
           <Sparkles className="w-3.5 h-3.5" /> Clínica de Beleza
