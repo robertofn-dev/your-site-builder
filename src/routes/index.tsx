@@ -56,6 +56,7 @@ function Home() {
       <About />
       <Gallery />
       <Testimonials />
+      <Scheduling />
       <Contact />
       <Footer />
       <FloatingWhats />
