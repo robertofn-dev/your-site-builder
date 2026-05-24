@@ -209,7 +209,7 @@ function About() {
           <div className="mt-7 space-y-5 text-muted-foreground leading-relaxed">
             <p>Sou apaixonada pela transformação que o cuidado com a pele pode proporcionar na vida das pessoas. Com anos de dedicação e especialização em estética avançada, minha missão é realçar a beleza natural de cada cliente.</p>
             <p>Acredito em uma estética que respeita a individualidade. Não existem fórmulas prontas; cada pele tem sua história e necessita de uma atenção única. Por isso, todos os nossos protocolos são desenvolvidos após uma avaliação criteriosa.</p>
-            <p>Meu clínica foi criado para ser o seu refúgio — um espaço onde o estresse fica do lado de fora, e você é o centro de todo o cuidado.</p>
+            <p>Minha clínica foi criada para ser o seu refúgio — um espaço onde o estresse fica do lado de fora, e você é o centro de todo o cuidado.</p>
           </div>
           <a href="https://www.instagram.com/dragiselenascimento_/" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all">
             <Instagram className="w-4 h-4" /> Conheça meu dia a dia
