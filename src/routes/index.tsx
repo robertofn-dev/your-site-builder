@@ -95,8 +95,9 @@ function Header() {
           <a href="#tratamentos" onClick={() => setOpen(false)}>Tratamentos</a>
           <a href="#sobre" onClick={() => setOpen(false)}>Sobre</a>
           <a href="#galeria" onClick={() => setOpen(false)}>Galeria</a>
+          <a href="#agendamento" onClick={() => setOpen(false)}>Agendar</a>
           <a href="#contato" onClick={() => setOpen(false)}>Contato</a>
-          <a href={WHATSAPP} target="_blank" rel="noreferrer" className="rounded-full bg-primary px-5 py-2.5 text-center text-primary-foreground">Agendar</a>
+          <a href="#agendamento" onClick={() => setOpen(false)} className="rounded-full bg-primary px-5 py-2.5 text-center text-primary-foreground">Agendar Online</a>
         </div>
       )}
     </header>
