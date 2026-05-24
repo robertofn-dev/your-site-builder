@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDays } from "lucide-react";
 import heroImg from "@/assets/hero.png";
+import clinicInterior from "@/assets/clinic-interior.jpg";
 import aboutImg from "@/assets/about.jpg";
 import gallery1 from "@/assets/lips.jpg";
 import gallery2 from "@/assets/care.jpg";
@@ -107,8 +108,11 @@ function Header() {
 function Hero() {
   return (
     <section id="top" className="relative h-[88vh] min-h-[620px] w-full overflow-hidden bg-secondary">
-      <img src={heroImg} alt="Clínica de beleza Dra. Gisele Nascimento" className="absolute inset-y-0 right-0 h-full w-auto max-w-[55%] object-contain object-right-top" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+      <div className="absolute inset-y-0 right-0 h-full w-full max-w-[60%] flex">
+        <img src={clinicInterior} alt="Recepção da clínica Gisele Nascimento" className="h-full w-1/2 object-cover object-center" />
+        <img src={heroImg} alt="Dra. Gisele Nascimento" className="h-full w-1/2 object-cover object-top" />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/10" />
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10 h-full flex flex-col justify-center">
         <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/85 mb-6">
           <Sparkles className="w-3.5 h-3.5" /> Clínica de Beleza
