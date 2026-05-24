@@ -486,11 +486,11 @@ function Scheduling() {
   const [time, setTime] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [taken, setTaken] = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-  const startCheckout = useServerFn(createAppointmentCheckout);
+  const bookAppointment = useServerFn(createAppointment);
 
   const allTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
@@ -516,30 +516,24 @@ function Scheduling() {
     }
     setSubmitting(true);
     try {
-      const result = await startCheckout({
+      await bookAppointment({
         data: {
           name, phone, treatment,
           appointment_date: date,
           appointment_time: time,
-          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
-          environment: getStripeEnvironment(),
         },
       });
-      setClientSecret(result.clientSecret);
+      setSuccess(true);
+      // Notifica a Dra. via WhatsApp
+      const msg = `Olá, Dra. Gisele!%0A%0AGostaria de confirmar meu agendamento:%0A%0ANome: ${name}%0AWhatsApp: ${phone}%0AProcedimento: ${treatment}%0AData: ${date.split("-").reverse().join("/")}%0AHorário: ${time}`;
+      window.open(`https://wa.me/551123826915?text=${msg}`, "_blank");
+      // Reset form
+      setName(""); setPhone(""); setTreatment(""); setDate(""); setTime("");
+      setTimeout(() => setSuccess(false), 6000);
     } catch (err: any) {
-      setError(err?.message || "Não foi possível iniciar o pagamento. Tente novamente.");
+      setError(err?.message || "Não foi possível agendar. Tente novamente.");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const closeCheckout = () => {
-    setClientSecret(null);
-    // refresh taken slots
-    if (date) {
-      supabase.rpc("get_taken_slots", { p_date: date }).then(({ data }) => {
-        if (data) setTaken((data as any[]).map((r) => r.appointment_time.slice(0, 5)));
-      });
     }
   };
 
@@ -605,46 +599,18 @@ function Scheduling() {
             </Field>
           </div>
 
-          <div className="rounded-2xl bg-primary/5 border border-primary/20 p-4 text-sm">
-            <p className="font-medium text-foreground">Taxa de reserva: R$ 100,00</p>
-            <p className="text-muted-foreground text-xs mt-1">
-              Garanta seu horário pagando uma taxa de R$ 100. O valor restante do tratamento é pago na clínica.
-            </p>
-          </div>
-
           <p className="text-xs text-muted-foreground flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
             Atendimento de segunda a sábado, das 09h às 17h. Horários já reservados aparecem como ocupados.
           </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
+          {success && <p className="text-sm text-primary">Agendamento enviado! Confirme pelo WhatsApp.</p>}
 
           <button type="submit" disabled={submitting} className="w-full rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60">
-            {submitting ? "Preparando pagamento..." : <>Pagar R$ 100 e reservar horário <ArrowRight className="w-4 h-4" /></>}
+            {submitting ? "Enviando..." : <>Solicitar agendamento <ArrowRight className="w-4 h-4" /></>}
           </button>
-          <p className="text-xs text-muted-foreground text-center">
-            Pagamento seguro processado pelo Stripe. Em caso de cancelamento, entre em contato pelo WhatsApp.
-          </p>
         </form>
-
-        {clientSecret && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto p-4">
-            <div className="relative w-full max-w-xl my-8 bg-card rounded-2xl shadow-elegant">
-              <button
-                onClick={closeCheckout}
-                aria-label="Fechar"
-                className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center hover:bg-muted z-10"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <div className="p-2 sm:p-4">
-                <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
-                  <EmbeddedCheckout />
-                </EmbeddedCheckoutProvider>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
