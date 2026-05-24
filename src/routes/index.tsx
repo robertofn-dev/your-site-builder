@@ -572,18 +572,13 @@ function Scheduling() {
               />
             </Field>
             <Field label="Horário">
-              <select value={time} onChange={(e) => setTime(e.target.value)} required disabled={!date || loadingSlots} className="input">
+              <select value={time} onChange={(e) => setTime(e.target.value)} required disabled={!date} className="input">
                 <option value="">
-                  {!date ? "Escolha a data primeiro" : loadingSlots ? "Carregando..." : "Selecione um horário"}
+                  {!date ? "Escolha a data primeiro" : "Selecione um horário"}
                 </option>
-                {allTimes.map((t) => {
-                  const isTaken = taken.includes(t);
-                  return (
-                    <option key={t} value={t} disabled={isTaken}>
-                      {t} {isTaken ? "— ocupado" : ""}
-                    </option>
-                  );
-                })}
+                {allTimes.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
               </select>
             </Field>
           </div>
