@@ -107,7 +107,7 @@ function Header() {
 function Hero() {
   return (
     <section id="top" className="relative h-[88vh] min-h-[620px] w-full overflow-hidden">
-      <img src={heroImg} alt="Clínica de beleza Dra. Gisele Nascimento" className="absolute inset-0 w-full h-full object-cover" />
+      <img src={heroImg} alt="Clínica de beleza Dra. Gisele Nascimento" className="absolute inset-0 w-full h-full object-cover object-top" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/55" />
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10 h-full flex flex-col justify-center">
         <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/85 mb-6">
