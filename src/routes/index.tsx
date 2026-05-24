@@ -31,7 +31,7 @@ const treatments = [
   { title: "Harmonização Facial", duration: "60–90 min", desc: "Procedimento que equilibra e realça as proporções do rosto com técnicas minimamente invasivas para um resultado natural e harmonioso." },
   { title: "Botox", duration: "30 min", desc: "Aplicação precisa de toxina botulínica para suavizar rugas de expressão, prevenir o envelhecimento e proporcionar um visual descansado." },
   { title: "Preenchimento Labial", duration: "45 min", desc: "Volumização e definição dos lábios com ácido hialurônico para um resultado natural, simétrico e com hidratação duradoura." },
-  { title: "Peeling Químico", duration: "60 min", desc: "Renovação celular intensa que atenua manchas, linhas finas e uniformiza a textura e o tom da pele." },
+  { title: "Bioestimulador de Colágeno", duration: "60 min", desc: "Estimula a produção natural de colágeno, devolvendo firmeza, viço e sustentação à pele com resultados progressivos e duradouros." },
 ];
 
 const gallery = [
