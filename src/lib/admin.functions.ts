@@ -68,7 +68,7 @@ export const updateStatus = createServerFn({ method: "POST" })
       .object({
         password: z.string().min(1).max(200),
         id: z.string().uuid(),
-        status: z.enum(["pending", "confirmed", "cancelled", "blocked"]),
+        status: z.enum(["pending", "confirmed", "cancelled", "blocked", "pending_payment"]),
       })
       .parse(input),
   )
