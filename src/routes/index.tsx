@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDays } from "lucide-react";
+import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDays, X } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 import clinicInterior from "@/assets/clinic-interior.jpg";
 import aboutImg from "@/assets/about.jpg";
@@ -8,6 +8,11 @@ import gallery2 from "@/assets/care.jpg";
 import gallery3 from "@/assets/gallery3.png";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { createAppointmentCheckout } from "@/lib/payments.functions";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,6 +55,7 @@ const fallbackTestimonials = [
 function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PaymentTestModeBanner />
       <Header />
       <Hero />
       <Philosophy />
@@ -485,15 +491,12 @@ function Scheduling() {
   const [submitting, setSubmitting] = useState(false);
   const [taken, setTaken] = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  const startCheckout = useServerFn(createAppointmentCheckout);
 
   const allTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
-  const formatDate = (iso: string) => {
-    const [y, m, d] = iso.split("-");
-    return `${d}/${m}/${y}`;
-  };
-
-  // Carrega horários ocupados quando a data muda
   useEffect(() => {
     if (!date) { setTaken([]); return; }
     setLoadingSlots(true);
@@ -515,38 +518,32 @@ function Scheduling() {
       return;
     }
     setSubmitting(true);
-    const { error: insertError } = await supabase.from("appointments").insert({
-      name, phone, treatment,
-      appointment_date: date,
-      appointment_time: `${time}:00`,
-      status: "pending",
-    });
-    setSubmitting(false);
-    if (insertError) {
-      if (insertError.code === "23505") {
-        setError("Esse horário acabou de ser reservado. Por favor, escolha outro.");
-        // recarrega slots
-        supabase.rpc("get_taken_slots", { p_date: date }).then(({ data }) => {
-          if (data) setTaken((data as any[]).map((r) => r.appointment_time.slice(0, 5)));
-        });
-      } else {
-        setError("Não foi possível salvar. Tente novamente.");
-      }
-      return;
+    try {
+      const result = await startCheckout({
+        data: {
+          name, phone, treatment,
+          appointment_date: date,
+          appointment_time: time,
+          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+          environment: getStripeEnvironment(),
+        },
+      });
+      setClientSecret(result.clientSecret);
+    } catch (err: any) {
+      setError(err?.message || "Não foi possível iniciar o pagamento. Tente novamente.");
+    } finally {
+      setSubmitting(false);
     }
-    const text =
-      `Olá, Dra. Gisele! Acabei de fazer um agendamento pelo site.%0A%0A` +
-      `*Nome:* ${name}%0A` +
-      `*WhatsApp:* ${phone}%0A` +
-      `*Procedimento:* ${treatment}%0A` +
-      `*Data:* ${formatDate(date)}%0A` +
-      `*Horário:* ${time}%0A%0A` +
-      `Aguardo a confirmação. Obrigada!`;
-    window.open(`https://wa.me/551123826915?text=${text}`, "_blank");
-    // limpa
-    setName(""); setPhone(""); setTreatment(""); setDate(""); setTime("");
-    setTaken([]);
-    alert("Agendamento enviado! A Dra. Gisele entrará em contato para confirmar.");
+  };
+
+  const closeCheckout = () => {
+    setClientSecret(null);
+    // refresh taken slots
+    if (date) {
+      supabase.rpc("get_taken_slots", { p_date: date }).then(({ data }) => {
+        if (data) setTaken((data as any[]).map((r) => r.appointment_time.slice(0, 5)));
+      });
+    }
   };
 
   return (
@@ -611,6 +608,13 @@ function Scheduling() {
             </Field>
           </div>
 
+          <div className="rounded-2xl bg-primary/5 border border-primary/20 p-4 text-sm">
+            <p className="font-medium text-foreground">Taxa de reserva: R$ 100,00</p>
+            <p className="text-muted-foreground text-xs mt-1">
+              Garanta seu horário pagando uma taxa de R$ 100. O valor restante do tratamento é pago na clínica.
+            </p>
+          </div>
+
           <p className="text-xs text-muted-foreground flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
             Atendimento de segunda a sábado, das 09h às 17h. Horários já reservados aparecem como ocupados.
@@ -619,12 +623,31 @@ function Scheduling() {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <button type="submit" disabled={submitting} className="w-full rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60">
-            {submitting ? "Enviando..." : <>Enviar agendamento pelo WhatsApp <ArrowRight className="w-4 h-4" /></>}
+            {submitting ? "Preparando pagamento..." : <>Pagar R$ 100 e reservar horário <ArrowRight className="w-4 h-4" /></>}
           </button>
           <p className="text-xs text-muted-foreground text-center">
-            Após enviar, a Dra. Gisele entrará em contato para confirmar a disponibilidade do horário.
+            Pagamento seguro processado pelo Stripe. Em caso de cancelamento, entre em contato pelo WhatsApp.
           </p>
         </form>
+
+        {clientSecret && (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto p-4">
+            <div className="relative w-full max-w-xl my-8 bg-card rounded-2xl shadow-elegant">
+              <button
+                onClick={closeCheckout}
+                aria-label="Fechar"
+                className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center hover:bg-muted z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="p-2 sm:p-4">
+                <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

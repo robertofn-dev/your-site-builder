@@ -24,6 +24,7 @@ export type Database = {
           notes: string | null
           phone: string
           status: string
+          stripe_session_id: string | null
           treatment: string
         }
         Insert: {
@@ -35,6 +36,7 @@ export type Database = {
           notes?: string | null
           phone: string
           status?: string
+          stripe_session_id?: string | null
           treatment: string
         }
         Update: {
@@ -46,6 +48,7 @@ export type Database = {
           notes?: string | null
           phone?: string
           status?: string
+          stripe_session_id?: string | null
           treatment?: string
         }
         Relationships: []
