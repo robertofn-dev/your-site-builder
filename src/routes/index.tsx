@@ -8,8 +8,6 @@ import gallery2 from "@/assets/care.jpg";
 import gallery3 from "@/assets/gallery3.png";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useServerFn } from "@tanstack/react-start";
-import { createAppointment } from "@/lib/appointments.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -487,24 +485,8 @@ function Scheduling() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [taken, setTaken] = useState<string[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
-
-  const bookAppointment = useServerFn(createAppointment);
 
   const allTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-
-  useEffect(() => {
-    if (!date) { setTaken([]); return; }
-    setLoadingSlots(true);
-    setTime("");
-    supabase.rpc("get_taken_slots", { p_date: date }).then(({ data, error }) => {
-      if (!error && data) {
-        setTaken((data as Array<{ appointment_time: string }>).map((r) => r.appointment_time.slice(0, 5)));
-      }
-      setLoadingSlots(false);
-    });
-  }, [date]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -516,13 +498,20 @@ function Scheduling() {
     }
     setSubmitting(true);
     try {
-      await bookAppointment({
-        data: {
-          name, phone, treatment,
-          appointment_date: date,
-          appointment_time: time,
-        },
+      const { error: insertError } = await supabase.from("appointments").insert({
+        name: name.trim(),
+        phone: phone.trim(),
+        treatment,
+        appointment_date: date,
+        appointment_time: `${time}:00`,
+        status: "pending",
       });
+
+      if (insertError) {
+        const alreadyReserved = insertError.message.toLowerCase().includes("duplicate") || insertError.code === "23505";
+        throw new Error(alreadyReserved ? "Esse horário já foi reservado. Escolha outro." : "Não foi possível salvar o agendamento. Tente novamente.");
+      }
+
       setSuccess(true);
       // Notifica a Dra. via WhatsApp
       const msg = `Olá, Dra. Gisele!%0A%0AGostaria de confirmar meu agendamento:%0A%0ANome: ${name}%0AWhatsApp: ${phone}%0AProcedimento: ${treatment}%0AData: ${date.split("-").reverse().join("/")}%0AHorário: ${time}`;
@@ -583,25 +572,20 @@ function Scheduling() {
               />
             </Field>
             <Field label="Horário">
-              <select value={time} onChange={(e) => setTime(e.target.value)} required disabled={!date || loadingSlots} className="input">
+              <select value={time} onChange={(e) => setTime(e.target.value)} required disabled={!date} className="input">
                 <option value="">
-                  {!date ? "Escolha a data primeiro" : loadingSlots ? "Carregando..." : "Selecione um horário"}
+                  {!date ? "Escolha a data primeiro" : "Selecione um horário"}
                 </option>
-                {allTimes.map((t) => {
-                  const isTaken = taken.includes(t);
-                  return (
-                    <option key={t} value={t} disabled={isTaken}>
-                      {t} {isTaken ? "— ocupado" : ""}
-                    </option>
-                  );
-                })}
+                {allTimes.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
               </select>
             </Field>
           </div>
 
           <p className="text-xs text-muted-foreground flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
-            Atendimento de segunda a sábado, das 09h às 17h. Horários já reservados aparecem como ocupados.
+            Atendimento de segunda a sábado, das 09h às 17h. Se o horário já estiver reservado, avisaremos na hora.
           </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
