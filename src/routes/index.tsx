@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star } from "lucide-react";
+import { Instagram, MapPin, Phone, Clock, Sparkles, ArrowRight, Star, CalendarDays } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 import aboutImg from "@/assets/about.png";
 import gallery1 from "@/assets/gallery1.png";
