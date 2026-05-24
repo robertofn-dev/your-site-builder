@@ -228,7 +228,7 @@ function Gallery() {
           <span className="text-xs uppercase tracking-[0.3em] text-primary">Portfólio</span>
           <h2 className="mt-5 font-display text-4xl sm:text-5xl">Resultados & Experiência</h2>
           <p className="mt-5 text-muted-foreground text-lg">
-            Um vislumbre do cuidado e dedicação presentes em cada detalhe do nosso clínica.
+            Um vislumbre do cuidado e dedicação presentes em cada detalhe da nossa clínica.
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-5">
