@@ -11,9 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dra. Gisele Nascimento — Ateliê de Beleza & Estética Avançada" },
+      { title: "Dra. Gisele Nascimento — Clínica de Beleza & Estética Avançada" },
       { name: "description", content: "Tratamentos estéticos personalizados no Tatuapé, São Paulo. Harmonização facial, botox, preenchimento e peeling com a Dra. Gisele Nascimento." },
-      { property: "og:title", content: "Dra. Gisele Nascimento — Ateliê de Beleza" },
+      { property: "og:title", content: "Dra. Gisele Nascimento — Clínica de Beleza" },
       { property: "og:description", content: "Sua beleza, cuidada com maestria. Estética avançada em São Paulo." },
     ],
     links: [
@@ -107,11 +107,11 @@ function Header() {
 function Hero() {
   return (
     <section id="top" className="relative h-[88vh] min-h-[620px] w-full overflow-hidden">
-      <img src={heroImg} alt="Ateliê de beleza Dra. Gisele Nascimento" className="absolute inset-0 w-full h-full object-cover" />
+      <img src={heroImg} alt="Clínica de beleza Dra. Gisele Nascimento" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/55" />
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10 h-full flex flex-col justify-center">
         <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/85 mb-6">
-          <Sparkles className="w-3.5 h-3.5" /> Ateliê de Beleza
+          <Sparkles className="w-3.5 h-3.5" /> Clínica de Beleza
         </span>
         <h1 className="font-display text-white text-5xl sm:text-6xl lg:text-7xl leading-[1.05] max-w-3xl text-balance">
           Sua beleza,<br />
@@ -143,7 +143,7 @@ function Philosophy() {
         </h2>
         <p className="mt-8 text-muted-foreground text-lg leading-relaxed">
           Acreditamos que a estética vai muito além da aparência. É sobre como você se sente na sua própria pele.
-          Nosso ateliê oferece uma abordagem integrativa, unindo tecnologia de ponta, produtos de excelência
+          Nosso clínica oferece uma abordagem integrativa, unindo tecnologia de ponta, produtos de excelência
           e um cuidado genuinamente humano para revelar o brilho natural que já existe em você.
         </p>
       </div>
@@ -209,7 +209,7 @@ function About() {
           <div className="mt-7 space-y-5 text-muted-foreground leading-relaxed">
             <p>Sou apaixonada pela transformação que o cuidado com a pele pode proporcionar na vida das pessoas. Com anos de dedicação e especialização em estética avançada, minha missão é realçar a beleza natural de cada cliente.</p>
             <p>Acredito em uma estética que respeita a individualidade. Não existem fórmulas prontas; cada pele tem sua história e necessita de uma atenção única. Por isso, todos os nossos protocolos são desenvolvidos após uma avaliação criteriosa.</p>
-            <p>Meu ateliê foi criado para ser o seu refúgio — um espaço onde o estresse fica do lado de fora, e você é o centro de todo o cuidado.</p>
+            <p>Meu clínica foi criado para ser o seu refúgio — um espaço onde o estresse fica do lado de fora, e você é o centro de todo o cuidado.</p>
           </div>
           <a href="https://www.instagram.com/dragiselenascimento_/" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all">
             <Instagram className="w-4 h-4" /> Conheça meu dia a dia
@@ -228,7 +228,7 @@ function Gallery() {
           <span className="text-xs uppercase tracking-[0.3em] text-primary">Portfólio</span>
           <h2 className="mt-5 font-display text-4xl sm:text-5xl">Resultados & Experiência</h2>
           <p className="mt-5 text-muted-foreground text-lg">
-            Um vislumbre do cuidado e dedicação presentes em cada detalhe do nosso ateliê.
+            Um vislumbre do cuidado e dedicação presentes em cada detalhe do nosso clínica.
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-5">
@@ -274,7 +274,7 @@ function Testimonials() {
           <span className="text-xs uppercase tracking-[0.3em] text-primary">Avaliações</span>
           <h2 className="mt-5 font-display text-4xl sm:text-5xl">O que dizem nossas clientes</h2>
           <p className="mt-5 text-muted-foreground text-lg">
-            Histórias reais de quem já passou pelo nosso ateliê.
+            Histórias reais de quem já passou pelo nosso clínica.
           </p>
         </div>
         {loading ? (
